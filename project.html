@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="id" class="scroll-smooth dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Detail Project — Website 8B</title><script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{900:'#030712',800:'#07101f',700:'#0c1a2d'},accent:{DEFAULT:'#22d3ee',dark:'#0891b2'}}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+:root{--bg:#030712;--bg2:#07101d;--panel:rgba(8,16,31,.82);--panel2:rgba(5,11,23,.94);--cyan:#22d3ee;--cyan2:#67e8f9;--blue:#3b82f6;--purple:#8b5cf6;--pink:#ec4899;--line:rgba(34,211,238,.16);--text:#e7f7ff;--muted:#7f96ad}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 0%,rgba(34,211,238,.08),transparent 28%),radial-gradient(circle at 92% 15%,rgba(139,92,246,.08),transparent 30%),linear-gradient(180deg,#020617 0%,#030712 55%,#050816 100%);color:var(--text);font-family:Inter,sans-serif}
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.12;background-image:linear-gradient(rgba(34,211,238,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.08) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to bottom,#000,transparent 95%)}
+body::after{content:"";position:fixed;inset:0;z-index:9997;pointer-events:none;opacity:.025;background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(255,255,255,.5) 4px)}
+*,*:before,*:after{box-sizing:border-box}
+a,button{transition:.22s ease}
+::selection{background:var(--cyan);color:#021019}
+::-webkit-scrollbar{width:9px}::-webkit-scrollbar-track{background:#020617}::-webkit-scrollbar-thumb{background:linear-gradient(#0891b2,#7c3aed);border-radius:999px}
+.font-sans{font-family:Inter,sans-serif}
+.glass{background:rgba(2,7,18,.78)!important;border-color:var(--line)!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.cy-nav{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);box-shadow:0 10px 36px rgba(0,0,0,.25)}
+.cy-nav .wrap{max-width:1152px;margin:auto;height:72px;padding:0 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{font:800 1.15rem/1 Inter,sans-serif;color:#fff;text-shadow:0 0 13px rgba(34,211,238,.35);letter-spacing:-.03em;text-decoration:none}
+.logo span{color:var(--cyan2)}
+.nav-links{display:flex;gap:22px;align-items:center;list-style:none;padding:0;margin:0}
+.nav-links a{color:#91a4b8;font-size:.78rem;font-weight:700;text-decoration:none}
+.nav-links a:hover,.nav-links a.active{color:var(--cyan2);text-shadow:0 0 12px rgba(34,211,238,.22)}
+.icon-btn{width:40px;height:40px;border:1px solid rgba(34,211,238,.12);border-radius:11px;background:rgba(4,12,25,.5);color:#c9d9e7;display:grid;place-items:center;cursor:pointer}
+.icon-btn:hover{border-color:rgba(34,211,238,.35);box-shadow:0 0 18px rgba(34,211,238,.08)}
+.mobile-menu{display:none;max-width:1152px;margin:auto;padding:0 16px 14px}
+.mobile-menu.open{display:block}
+.mobile-menu a{display:block;padding:11px 4px;color:#9db0c2;text-decoration:none;font-size:.88rem}
+.mobile-menu a:hover{color:var(--cyan2)}
+.page{max-width:1152px;margin:auto;padding:54px 16px 80px}
+.eyebrow{font:700 .72rem/1 Rajdhani,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#67e8f9}
+h1,h2,h3{letter-spacing:-.03em}
+.page h1{font-family:Rajdhani,sans-serif;font-size:clamp(2.5rem,6vw,4.2rem);line-height:.95;margin:.6rem 0 1rem}
+.page h2{font-family:Rajdhani,sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1}
+.muted{color:var(--muted);line-height:1.8}
+.card{border:1px solid rgba(34,211,238,.12);background:linear-gradient(145deg,rgba(9,18,35,.82),rgba(3,9,19,.76));box-shadow:0 16px 50px rgba(0,0,0,.25);border-radius:20px}
+.card:hover{border-color:rgba(34,211,238,.28);box-shadow:0 20px 58px rgba(0,0,0,.32),0 0 24px rgba(34,211,238,.05)}
+.field{width:100%;padding:13px 14px;border:1px solid rgba(34,211,238,.13);border-radius:13px;background:rgba(2,8,18,.74);color:#e7f7ff;outline:none}
+.field::placeholder{color:#627b91}.field:focus{border-color:rgba(103,232,249,.55);box-shadow:0 0 0 3px rgba(34,211,238,.08)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:13px;font-weight:800;text-decoration:none;border:1px solid rgba(103,232,249,.26);cursor:pointer}
+.btn-primary{color:#021018;background:linear-gradient(135deg,#67e8f9,#22d3ee 50%,#60a5fa);box-shadow:0 0 24px rgba(34,211,238,.16)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 32px rgba(34,211,238,.25)}
+.btn-ghost{background:rgba(4,12,24,.55);color:#d9f8ff}.btn-ghost:hover{border-color:rgba(103,232,249,.52);transform:translateY(-2px)}
+.footer{border-top:1px solid rgba(34,211,238,.10);background:#020617}
+.footer .wrap{max-width:1152px;margin:auto;padding:28px 16px;color:#667e95;text-align:center;font-size:.78rem}
+.grid{display:grid;gap:18px}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.badge{display:inline-flex;padding:6px 10px;border-radius:999px;border:1px solid rgba(34,211,238,.18);background:rgba(34,211,238,.06);color:#7de7f4;font-size:.72rem;font-weight:800}
+.table-wrap{overflow:auto;border:1px solid rgba(34,211,238,.11);border-radius:18px;background:rgba(4,10,21,.6)}
+table{width:100%;min-width:760px;border-collapse:collapse}
+th{padding:13px 12px;background:#071326;color:#9fe9f4;font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;text-align:left}
+td{padding:13px 12px;border-top:1px solid rgba(34,211,238,.08);color:#c2d4e4}
+tr:nth-child(even) td{background:rgba(9,18,33,.28)}
+.skeleton{background:linear-gradient(90deg,rgba(148,163,184,.08),rgba(34,211,238,.14),rgba(148,163,184,.08));background-size:500px 100%;animation:shimmer 1.4s linear infinite}
+@keyframes shimmer{from{background-position:-500px 0}to{background-position:500px 0}}
+.status{font-size:.83rem;text-align:center}
+.hr{border-top:1px solid rgba(34,211,238,.1)}
+@media(max-width:900px){.nav-links{display:none}.grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.grid-3,.grid-2{grid-template-columns:1fr}.page{padding-top:34px}.page h1{font-size:3rem}}
+</style><style>
+html:not(.dark) body{background:#f4f7fb;color:#102033}
+html:not(.dark) body::before{opacity:.04}
+html:not(.dark) .cy-nav{background:rgba(255,255,255,.84)!important;color:#102033}
+html:not(.dark) .nav-links a{color:#52677c}
+html:not(.dark) .nav-links a:hover,html:not(.dark) .nav-links a.active{color:#0891b2}
+html:not(.dark) .card{background:#fff;border-color:#dce7ef;box-shadow:0 12px 30px rgba(15,23,42,.07)}
+html:not(.dark) .muted{color:#5e7388}
+html:not(.dark) .field{background:#fff;color:#102033;border-color:#d4e0e8}
+html:not(.dark) th{background:#0f2234;color:#a9eff8}
+html:not(.dark) td{color:#263e53;border-color:#e5edf2}
+html:not(.dark) tr:nth-child(even) td{background:#f8fbfd}
+html:not(.dark) .footer{background:#eef3f7}
+</style><script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/firebase-sync.js"></script>
+</head><body>
+<nav class="cy-nav glass">
+  <div class="wrap">
+    <a href="index.html" id="secretLogo" class="logo">8<span>B</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-nav="home">Beranda</a></li>
+      <li><a href="anggota.html" data-nav="anggota">Anggota</a></li>
+      <li><a href="jadwal.html" data-nav="jadwal">Jadwal</a></li>
+      <li><a href="kontak.html" data-nav="kontak">Kontak</a></li>
+    </ul>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="darkToggle" class="icon-btn" aria-label="Ganti tema">
+        <svg id="iconSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg id="iconMoon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+      <button id="menuBtn" class="icon-btn" aria-label="Buka menu" style="display:none">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div id="mobileMenu" class="mobile-menu">
+    <a href="index.html">Beranda</a><a href="anggota.html">Anggota</a><a href="jadwal.html">Jadwal</a><a href="kontak.html">Kontak</a>
+  </div>
+</nav>
+
+<main class="page" id="projectRoot" style="max-width:980px">
+  <a href="index.html#projects" class="muted" style="text-decoration:none;font-size:.82rem">← Kembali ke daftar project</a>
+  <div id="loading" style="margin-top:26px;display:grid;gap:13px"><div class="skeleton" style="height:34px;width:62%;border-radius:9px"></div><div class="skeleton" style="aspect-ratio:16/9;border-radius:18px"></div><div class="skeleton" style="height:16px;border-radius:8px"></div><div class="skeleton" style="height:16px;width:82%;border-radius:8px"></div></div>
+  <article id="projectDetail" style="display:none;margin-top:28px">
+    <span id="pTag" class="badge"></span>
+    <h1 id="pJudul"></h1>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;color:#7891a8;font-size:.78rem;margin:12px 0 24px"><span id="pTanggal"></span><span>•</span><span>Oleh Kelas 8B</span></div>
+    <div class="card" style="overflow:hidden;margin-bottom:26px"><img id="pGambar" style="width:100%;height:auto;display:block;object-fit:cover;max-height:620px" alt="" onerror="this.src='https://via.placeholder.com/1200x675/07101f/67e8f9?text=Project'"></div>
+    <div class="card" style="padding:24px;margin-bottom:18px"><p id="pDeskripsi" class="muted" style="font-size:1.02rem"></p></div>
+    <div class="grid grid-3" style="margin-bottom:22px">
+      <div class="card" style="padding:20px"><div class="eyebrow">CATEGORY</div><div id="pTagBox" style="font-weight:800;margin-top:7px"></div></div>
+      <div class="card" style="padding:20px"><div class="eyebrow">YEAR</div><div id="pTanggalBox" style="font-weight:800;margin-top:7px"></div></div>
+      <div class="card" style="padding:20px"><div class="eyebrow">STATUS</div><div style="font-weight:800;color:#34d399;margin-top:7px">SELESAI</div></div>
+    </div>
+    <div class="card" style="padding:24px;margin-bottom:24px"><div class="eyebrow">COLLABORATION</div><h3 style="margin:.5rem 0;font-size:1.25rem">Punya ide project?</h3><p class="muted" style="font-size:.88rem">Hubungi kelas 8B lewat halaman kontak.</p><a href="kontak.html" class="btn btn-primary" style="margin-top:14px">Hubungi Kami</a></div>
+    <div class="hr" style="padding-top:22px"><h2 style="font-size:1.6rem">Project lainnya</h2><div id="otherProjects" class="grid grid-2" style="margin-top:14px"></div></div>
+  </article>
+  <div id="notFound" style="display:none;text-align:center;padding:70px 0"><div style="font-size:3rem">⌁</div><h2>Project tidak ditemukan</h2><p class="muted">Project yang kamu cari tidak ada atau sudah dihapus.</p><a href="index.html#projects" class="btn btn-primary" style="margin-top:10px">Kembali</a></div>
+</main>
+<footer class="footer"><div class="wrap">© <span id="year"></span> Website 8B. ALL RIGHTS RESERVED.</div></footer><script src="assets/js/main.js"></script><script src="assets/js/project-detail.js"></script><script src="assets/js/music.js"></script>
+<script>
+(function(){
+  const root=document.documentElement;
+  const stored=localStorage.getItem('theme');
+  if(stored==='light') root.classList.remove('dark'); else root.classList.add('dark');
+  const y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear();
+  const menuBtn=document.getElementById('menuBtn'), menu=document.getElementById('mobileMenu');
+  if(menuBtn&&menu){
+    menuBtn.style.display='';
+    menuBtn.addEventListener('click',()=>menu.classList.toggle('open'));
+  }
+  const toggle=document.getElementById('darkToggle');
+  function icons(){
+    const dark=root.classList.contains('dark');
+    document.getElementById('iconSun')?.classList.toggle('hidden',!dark);
+    document.getElementById('iconMoon')?.classList.toggle('hidden',dark);
+  }
+  if(toggle) toggle.addEventListener('click',()=>{
+    const dark=root.classList.toggle('dark');
+    localStorage.setItem('theme',dark?'dark':'light'); icons();
+  });
+  icons();
+})();
+</script>
+</body></html>

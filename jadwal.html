@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#030712">
+  <title>Website 8B — Jadwal Pelajaran</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            navy: { 900:'#030712', 800:'#07101f', 700:'#0c1a2d' },
+            accent: { DEFAULT:'#22d3ee', dark:'#0891b2' }
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/firebase-sync.js"></script>
+
+  <style>
+    :root{
+      --j-bg:#030712;
+      --j-panel:#081321;
+      --j-panel2:#0a1727;
+      --j-line:rgba(34,211,238,.14);
+      --j-text:#e9f7ff;
+      --j-muted:#8499ad;
+      --j-cyan:#22d3ee;
+      --j-blue:#60a5fa;
+      --j-purple:#8b5cf6;
+      --j-green:#34d399;
+    }
+
+    body{
+      background:
+        radial-gradient(circle at 10% 0%,rgba(34,211,238,.065),transparent 30%),
+        radial-gradient(circle at 88% 18%,rgba(139,92,246,.07),transparent 30%),
+        linear-gradient(180deg,#020617,#030712 56%,#050816);
+    }
+
+    body::before{
+      opacity:.07;
+      background-size:54px 54px;
+    }
+
+    .schedule-hero{
+      position:relative;
+      overflow:hidden;
+      border-bottom:1px solid var(--j-line);
+      background:
+        radial-gradient(circle at 78% 40%,rgba(96,165,250,.10),transparent 30%),
+        radial-gradient(circle at 20% 70%,rgba(34,211,238,.08),transparent 30%);
+    }
+
+    .hero-line{
+      position:absolute;
+      width:360px;
+      height:1px;
+      background:linear-gradient(90deg,transparent,var(--j-cyan),transparent);
+      box-shadow:0 0 16px rgba(34,211,238,.35);
+      opacity:.45;
+      transform:rotate(-12deg);
+    }
+
+    .hero-line.one{right:3%;top:28%}
+    .hero-line.two{right:19%;top:61%;width:230px;transform:rotate(-25deg);opacity:.28}
+
+    .page-wrap{
+      max-width:1120px;
+      margin:0 auto;
+      padding:0 16px;
+    }
+
+    .schedule-title{
+      font-family:Rajdhani,sans-serif;
+      font-size:clamp(3rem,8vw,5.4rem);
+      line-height:.9;
+      letter-spacing:-.035em;
+      font-weight:700;
+      color:#f2fbff;
+    }
+
+    .schedule-title span{
+      color:#67e8f9;
+      text-shadow:0 0 25px rgba(34,211,238,.12);
+    }
+
+    .eyebrow{
+      color:#67e8f9;
+      font:700 .72rem/1 Rajdhani,sans-serif;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+    }
+
+    .info-card{
+      border:1px solid var(--j-line);
+      background:linear-gradient(145deg,rgba(8,19,33,.80),rgba(3,9,20,.76));
+      border-radius:18px;
+      box-shadow:0 18px 50px rgba(0,0,0,.25);
+    }
+
+    .day-tab{
+      border:1px solid rgba(34,211,238,.12);
+      color:#8197aa;
+      background:rgba(5,12,24,.55);
+      padding:10px 14px;
+      border-radius:12px;
+      font-size:.8rem;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .day-tab:hover{
+      color:#c9f7ff;
+      border-color:rgba(34,211,238,.28);
+    }
+
+    .day-tab.active{
+      color:#021018;
+      background:linear-gradient(135deg,#67e8f9,#22d3ee);
+      border-color:#67e8f9;
+      box-shadow:0 0 22px rgba(34,211,238,.16);
+    }
+
+    .day-panel{
+      display:none;
+    }
+
+    .day-panel.active{
+      display:block;
+      animation:panelIn .38s ease both;
+    }
+
+    @keyframes panelIn{
+      from{opacity:0;transform:translateY(8px)}
+      to{opacity:1;transform:none}
+    }
+
+    .day-heading{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:16px;
+    }
+
+    .day-name{
+      font-family:Rajdhani,sans-serif;
+      font-size:2.1rem;
+      line-height:1;
+      font-weight:700;
+    }
+
+    .period{
+      display:grid;
+      grid-template-columns:142px 1fr;
+      align-items:stretch;
+      border:1px solid rgba(34,211,238,.10);
+      border-radius:14px;
+      overflow:hidden;
+      margin-top:9px;
+      background:rgba(4,11,22,.56);
+    }
+
+    .period-time{
+      display:flex;
+      align-items:center;
+      padding:13px 14px;
+      color:#86ddea;
+      background:rgba(34,211,238,.035);
+      border-right:1px solid rgba(34,211,238,.10);
+      font-family:Rajdhani,sans-serif;
+      font-weight:700;
+      letter-spacing:.03em;
+      white-space:nowrap;
+    }
+
+    .period-subject{
+      display:flex;
+      align-items:center;
+      padding:13px 15px;
+      color:#d7e8f4;
+      line-height:1.35;
+      font-size:.88rem;
+    }
+
+    .period.break{
+      border-color:rgba(250,204,21,.22);
+      background:rgba(250,204,21,.035);
+    }
+
+    .period.break .period-time,
+    .period.break .period-subject{
+      color:#fde047;
+    }
+
+    .period.special{
+      border-color:rgba(52,211,153,.17);
+      background:rgba(52,211,153,.025);
+    }
+
+    .period.special .period-time{
+      color:#6ee7b7;
+    }
+
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      font-size:.72rem;
+      color:#748b9f;
+      margin-top:15px;
+    }
+
+    .legend span{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 9px;
+      border:1px solid rgba(34,211,238,.08);
+      border-radius:999px;
+      background:rgba(4,11,22,.45);
+    }
+
+    .legend i{
+      width:7px;height:7px;border-radius:50%;
+      background:#22d3ee;
+      box-shadow:0 0 8px rgba(34,211,238,.45);
+    }
+
+    .legend .yellow i{background:#facc15;box-shadow:none}
+    .legend .green i{background:#34d399;box-shadow:none}
+
+    html:not(.dark) body{
+      background:
+        radial-gradient(circle at 10% 0%,rgba(34,211,238,.045),transparent 30%),
+        linear-gradient(180deg,#f7fafc,#f2f6fa);
+      color:#17273a;
+    }
+
+    html:not(.dark) .schedule-title{
+      color:#13273a;
+    }
+
+    html:not(.dark) .info-card{
+      background:#fff;
+      border-color:#dce6ed;
+      box-shadow:0 16px 42px rgba(15,23,42,.07);
+    }
+
+    html:not(.dark) .day-tab{
+      background:#fff;
+      color:#62778b;
+      border-color:#dce6ed;
+    }
+
+    html:not(.dark) .day-tab.active{
+      color:#021018;
+      border-color:#22d3ee;
+    }
+
+    html:not(.dark) .period{
+      background:#fff;
+      border-color:#dfe8ee;
+    }
+
+    html:not(.dark) .period-time{
+      background:#f5fafc;
+      color:#087f99;
+      border-color:#e3edf2;
+    }
+
+    html:not(.dark) .period-subject{
+      color:#31485d;
+    }
+
+    html:not(.dark) .period.break{
+      background:#fffdf0;
+    }
+
+    html:not(.dark) .period.special{
+      background:#f1fcf8;
+    }
+
+    @media(max-width:640px){
+      .page-wrap{padding:0 12px}
+      .period{
+        grid-template-columns:112px 1fr;
+      }
+      .period-time{
+        padding:12px 10px;
+        font-size:.82rem;
+      }
+      .period-subject{
+        padding:12px 11px;
+        font-size:.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-slate-100">
+
+  <nav class="sticky top-0 z-50 glass border-b border-cyan-300/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-[72px]">
+      <a href="index.html" id="secretLogo" class="font-extrabold text-xl tracking-tight">
+        <span class="text-accent">8B</span>
+      </a>
+
+      <ul class="hidden md:flex items-center gap-7 text-sm font-semibold">
+        <li><a href="index.html" class="hover:text-accent transition">Beranda</a></li>
+        <li><a href="anggota.html" class="hover:text-accent transition">Anggota</a></li>
+        <li><a href="jadwal.html" class="text-accent">Jadwal</a></li>
+        <li><a href="kontak.html" class="hover:text-accent transition">Kontak</a></li>
+      </ul>
+
+      <div class="flex items-center gap-2">
+        <button id="darkToggle" aria-label="Toggle theme" class="w-10 h-10 rounded-xl border border-cyan-300/10 hover:border-cyan-300/35 transition grid place-items-center">
+          <svg id="iconSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <svg id="iconMoon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+
+        <button id="menuBtn" class="md:hidden w-10 h-10 rounded-xl border border-cyan-300/10 grid place-items-center" aria-label="Menu">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <ul id="mobileMenu" class="md:hidden hidden px-4 pb-4 space-y-1 border-t border-cyan-300/10">
+      <li><a href="index.html" class="block py-2">Beranda</a></li>
+      <li><a href="anggota.html" class="block py-2">Anggota</a></li>
+      <li><a href="jadwal.html" class="block py-2 text-accent">Jadwal</a></li>
+      <li><a href="kontak.html" class="block py-2">Kontak</a></li>
+    </ul>
+  </nav>
+
+  <header class="schedule-hero">
+    <div class="hero-line one"></div>
+    <div class="hero-line two"></div>
+
+    <div class="page-wrap pt-16 md:pt-20 pb-12">
+      <div class="eyebrow">CLASS NETWORK // 8B</div>
+      <h1 class="schedule-title mt-4">Jadwal <span>Pelajaran.</span></h1>
+      <p class="mt-5 max-w-2xl text-slate-400">
+        Jadwal mingguan kelas 8B yang diambil dari tabel jadwal yang kamu kirim.
+        Pilih hari untuk melihat detail jam dan pelajaran.
+      </p>
+    </div>
+  </header>
+
+  <main class="page-wrap py-10 md:py-14">
+    <div class="info-card p-4 md:p-5">
+      <div id="dayTabs" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <div id="schedulePanels" class="mt-5"></div>
+
+    <div class="legend">
+      <span><i></i> Mata pelajaran</span>
+      <span class="yellow"><i></i> Istirahat / blok khusus</span>
+      <span class="green"><i></i> Kegiatan pagi / ibadah</span>
+    </div>
+
+    <p id="jadwalEmpty" class="hidden text-center text-slate-500 py-12">
+      Belum ada jadwal. Tambahkan lewat panel owner.
+    </p>
+  </main>
+
+  <footer class="border-t border-cyan-300/10 bg-[#020617]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-center text-sm text-slate-500">
+      © <span id="year"></span> Website 8B.
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/music.js"></script>
+
+  <script>
+    const SCREENSHOT_SCHEDULE = {"Senin": [["11.50 – 12.10", "MBG"], ["12.10 – 12.30", "Shalet Dzuhur Berjamaah, Asmaul Husna, Berdoa, dan MASKUMAMBANG"], ["12.30 – 12.55", "B.INGGRIS (1)"], ["12.55 – 13.20", "B.INGGRIS (1)"], ["13.20 – 13.45", "MTK"], ["13.45 – 13.55", "Istirahat"], ["13.55 – 14.20", "MTK"], ["14.20 – 14.45", "B.SUNDA"], ["14.45 – 15.10", "B.SUNDA"]], "Selasa": [["11.50 – 12.10", "MBG"], ["12.10 – 12.30", "Shalet Dzuhur Berjamaah, Asmaul Husna, Berdoa, dan MASKUMAMBANG"], ["12.30 – 12.55", "IPA (1)"], ["12.55 – 13.20", "IPA (1)"], ["13.20 – 13.45", "PPKn"], ["13.45 – 14.10", "PPKn"], ["14.10 – 14.20", "Istirahat"], ["14.20 – 14.45", "IPS (2)"], ["14.45 – 15.10", "IPS (2)"], ["15.10 – 15.35", "B.INDO (2)"], ["15.35 – 16.00", "B.INDO (2)"]], "Rabu": [["11.50 – 12.10", "MBG"], ["12.10 – 12.30", "Shalet Dzuhur Berjamaah, Asmaul Husna, Berdoa, dan GEULIS SAYAP"], ["12.30 – 12.55", "B.INDO (2)"], ["12.55 – 13.20", "B.INDO (2)"], ["13.20 – 13.45", "PJOK"], ["13.45 – 14.10", "PJOK"], ["14.10 – 14.20", "Istirahat"], ["14.20 – 14.45", "SENBUD & PRKY (1)"], ["14.45 – 15.10", "SENBUD & PRKY (1)"], ["15.10 – 15.35", "IPS (2)"], ["15.35 – 16.00", "IPS (2)"]], "Kamis": [["11.50 – 12.10", "MBG"], ["12.10 – 12.40", "Shalet Dzuhur Berjamaah, Asmaul Husna, Berdoa, dan MIII (Miras Runtah jeung Limbah)/SEGEUR"], ["12.40 – 13.05", "B.INGGRIS (1)"], ["13.05 – 13.30", "B.INGGRIS (1)"], ["13.30 – 13.55", "PAIBP (2)"], ["13.55 – 14.20", "PAIBP (2)"], ["14.20 – 14.30", "Istirahat"], ["14.30 – 14.55", "MTK"], ["14.55 – 15.20", "MTK"]], "Jumat": [["12.00 – 12.50", "Jum'at-an"], ["12.50 – 13.20", "MBG"], ["13.20 – 13.30", "Asmaul Husna dan Berdoa"], ["13.30 – 13.55", "INFORMATIKA"], ["13.55 – 14.20", "INFORMATIKA"], ["14.20 – 14.45", "IPA (1)"], ["14.45 – 15.10", "IPA (1)"]]};
+
+    (function(){
+      const tabs = document.getElementById('dayTabs');
+      const panels = document.getElementById('schedulePanels');
+      const empty = document.getElementById('jadwalEmpty');
+
+      const order = ['Senin','Selasa','Rabu','Kamis','Jumat'];
+
+      function esc(value){
+        return String(value ?? '').replace(/[&<>"']/g, function(char){
+          return {
+            '&':'&amp;',
+            '<':'&lt;',
+            '>':'&gt;',
+            '"':'&quot;',
+            "'":'&#39;'
+          }[char];
+        });
+      }
+
+      function classify(subject){
+        const s = String(subject || '').toLowerCase();
+        if(s.includes('istirahat')) return 'break';
+        if(
+          s === 'mbg' ||
+          s.includes('shalet') ||
+          s.includes('shalat') ||
+          s.includes('asmaul husna') ||
+          s.includes("jum'at-an") ||
+          s.includes("jumat-an") ||
+          s.includes('berdoa')
+        ) return 'special';
+        return '';
+      }
+
+      function normalizeFirebaseRows(rows){
+        // Compatibility with the original owner/Firebase format:
+        // [{jam,senin,selasa,rabu,kamis,jumat,sabtu}, ...]
+        if(!Array.isArray(rows) || !rows.length || !rows[0] || typeof rows[0] !== 'object') return null;
+
+        const result = {};
+        order.forEach(day => result[day] = []);
+
+        rows.forEach(row => {
+          const jam = row.jam || '';
+          order.forEach(day => {
+            const key = day.toLowerCase();
+            if(row[key] && row[key] !== '—'){
+              result[day].push([jam, row[key]]);
+            }
+          });
+        });
+
+        return result;
+      }
+
+      function render(data){
+        tabs.innerHTML = '';
+        panels.innerHTML = '';
+
+        let schedule = data;
+
+        if(Array.isArray(data)){
+          schedule = normalizeFirebaseRows(data);
+        }
+
+        if(!schedule || typeof schedule !== 'object'){
+          empty.classList.remove('hidden');
+          return;
+        }
+
+        empty.classList.add('hidden');
+
+        const availableDays = order.filter(day =>
+          Array.isArray(schedule[day]) && schedule[day].length
+        );
+
+        if(!availableDays.length){
+          empty.classList.remove('hidden');
+          return;
+        }
+
+        availableDays.forEach(function(day,index){
+          const tab = document.createElement('button');
+          tab.type = 'button';
+          tab.className = 'day-tab' + (index === 0 ? ' active' : '');
+          tab.textContent = day;
+          tab.dataset.day = day;
+          tabs.appendChild(tab);
+
+          const panel = document.createElement('section');
+          panel.className = 'day-panel' + (index === 0 ? ' active' : '');
+          panel.dataset.panel = day;
+
+          const heading = document.createElement('div');
+          heading.className = 'day-heading';
+          heading.innerHTML =
+            '<div>' +
+              '<div class="eyebrow">WEEKLY SCHEDULE</div>' +
+              '<div class="day-name">' + esc(day) + '</div>' +
+            '</div>' +
+            '<div class="text-xs text-slate-500 hidden sm:block">8B // CLASS SCHEDULE</div>';
+
+          panel.appendChild(heading);
+
+          schedule[day].forEach(function(item){
+            const time = Array.isArray(item) ? item[0] : item.jam;
+            const subject = Array.isArray(item) ? item[1] : item.subject;
+            const cls = classify(subject);
+
+            const row = document.createElement('div');
+            row.className = 'period ' + cls;
+            row.innerHTML =
+              '<div class="period-time">' + esc(time) + '</div>' +
+              '<div class="period-subject">' + esc(subject) + '</div>';
+            panel.appendChild(row);
+          });
+
+          panels.appendChild(panel);
+        });
+
+        tabs.querySelectorAll('.day-tab').forEach(function(tab){
+          tab.addEventListener('click', function(){
+            const day = tab.dataset.day;
+
+            tabs.querySelectorAll('.day-tab').forEach(t =>
+              t.classList.toggle('active', t === tab)
+            );
+
+            panels.querySelectorAll('.day-panel').forEach(panel =>
+              panel.classList.toggle('active', panel.dataset.panel === day)
+            );
+          });
+        });
+      }
+
+      render(SCREENSHOT_SCHEDULE);
+
+      // Firebase compatibility: when the owner updates jadwal,
+      // accept the original row-array format automatically.
+      try{
+        if(
+          window.FirebaseSync &&
+          typeof window.FirebaseSync.ready === 'function' &&
+          window.FirebaseSync.ready() &&
+          window.FIREBASE_PATHS &&
+          window.FIREBASE_PATHS.jadwal
+        ){
+          window.FirebaseSync.listen(window.FIREBASE_PATHS.jadwal, function(data){
+            if(data){
+              try{
+                localStorage.setItem('class_jadwal', JSON.stringify(data));
+              }catch(e){}
+              render(data);
+            }
+          });
+        }
+      }catch(error){
+        console.warn('Firebase jadwal listener:', error);
+      }
+    })();
+  </script>
+
+</body>
+</html>

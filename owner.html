@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Owner — Kelas 8B</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: {
+        fontFamily: { sans: ['Inter', 'sans-serif'] },
+        colors: { navy: { 900: '#0b1120', 800: '#0f172a', 700: '#1e293b' }, accent: { DEFAULT: '#22d3ee', dark: '#0891b2' } }
+      }}
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/firebase-sync.js"></script>
+
+<style>
+  .owner-cyber-shell{
+    position:relative;
+  }
+  .owner-cyber-shell::before{
+    content:"";
+    position:absolute;
+    inset:-40px -20px auto;
+    height:220px;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 18% 35%,rgba(34,211,238,.09),transparent 34%),
+      radial-gradient(circle at 82% 25%,rgba(139,92,246,.09),transparent 34%);
+    filter:blur(10px);
+  }
+
+  #tab-jadwal .schedule-admin{
+    position:relative;
+    border:1px solid rgba(34,211,238,.14);
+    border-radius:22px;
+    background:
+      linear-gradient(145deg,rgba(8,18,35,.86),rgba(3,9,20,.80));
+    box-shadow:0 24px 70px rgba(0,0,0,.28);
+    overflow:hidden;
+  }
+
+  html:not(.dark) #tab-jadwal .schedule-admin{
+    background:#fff;
+    border-color:#dce6ed;
+    box-shadow:0 18px 48px rgba(15,23,42,.07);
+  }
+
+  .schedule-admin-head{
+    padding:24px;
+    border-bottom:1px solid rgba(34,211,238,.10);
+  }
+
+  .schedule-admin-kicker{
+    color:#67e8f9;
+    font:700 .68rem/1.1 'Rajdhani',sans-serif;
+    letter-spacing:.20em;
+    text-transform:uppercase;
+  }
+
+  .schedule-admin-title{
+    margin:.55rem 0 .35rem;
+    font:700 2rem/1 'Rajdhani',sans-serif;
+    color:#f2fbff;
+    letter-spacing:-.02em;
+  }
+
+  html:not(.dark) .schedule-admin-title{color:#13273a}
+
+  .schedule-admin-copy{
+    color:#7f96ab;
+    font-size:.82rem;
+    line-height:1.7;
+    max-width:760px;
+  }
+
+  .schedule-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+    margin-top:18px;
+  }
+
+  .schedule-admin-btn{
+    border:1px solid rgba(34,211,238,.18);
+    border-radius:12px;
+    padding:10px 14px;
+    font-size:.78rem;
+    font-weight:800;
+    cursor:pointer;
+    color:#d8f7ff;
+    background:rgba(4,11,23,.58);
+  }
+
+  .schedule-admin-btn:hover{
+    border-color:rgba(103,232,249,.45);
+    transform:translateY(-1px);
+  }
+
+  .schedule-admin-btn.primary{
+    color:#031018;
+    background:linear-gradient(135deg,#67e8f9,#22d3ee 52%,#60a5fa);
+    border-color:rgba(103,232,249,.45);
+  }
+
+  .schedule-admin-btn.danger{
+    color:#fecdd3;
+    border-color:rgba(251,113,133,.20);
+  }
+
+  html:not(.dark) .schedule-admin-btn{
+    background:#f8fbfd;
+    color:#274055;
+    border-color:#dbe6ed;
+  }
+
+  .schedule-save-status{
+    min-height:20px;
+    margin-top:11px;
+    font-size:.76rem;
+    color:#6ee7b7;
+  }
+
+  .schedule-day-list{
+    padding:20px;
+    display:grid;
+    gap:14px;
+  }
+
+  .schedule-day-card{
+    border:1px solid rgba(34,211,238,.10);
+    border-radius:18px;
+    background:rgba(3,10,20,.48);
+    overflow:hidden;
+  }
+
+  html:not(.dark) .schedule-day-card{
+    background:#fbfdfe;
+    border-color:#e1e9ee;
+  }
+
+  .schedule-day-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:14px 16px;
+    border-bottom:1px solid rgba(34,211,238,.08);
+  }
+
+  .schedule-day-name{
+    font:700 1.2rem/1 'Rajdhani',sans-serif;
+    color:#e9f8ff;
+  }
+
+  html:not(.dark) .schedule-day-name{color:#1b3044}
+
+  .schedule-add-day{
+    border:1px solid rgba(34,211,238,.16);
+    background:rgba(34,211,238,.045);
+    color:#7fe8f6;
+    border-radius:10px;
+    padding:7px 10px;
+    font-size:.72rem;
+    font-weight:800;
+    cursor:pointer;
+  }
+
+  .schedule-row{
+    display:grid;
+    grid-template-columns:170px minmax(0,1fr) 38px;
+    gap:10px;
+    padding:10px 12px;
+    border-top:1px solid rgba(34,211,238,.055);
+    align-items:center;
+  }
+
+  .schedule-row:first-child{border-top:0}
+
+  .schedule-row input{
+    width:100%;
+    min-width:0;
+    padding:10px 11px;
+    border-radius:10px;
+    border:1px solid rgba(34,211,238,.11);
+    background:rgba(2,8,18,.72);
+    color:#e8f7ff;
+    outline:none;
+    font-size:.78rem;
+  }
+
+  .schedule-row input:focus{
+    border-color:rgba(103,232,249,.42);
+    box-shadow:0 0 0 3px rgba(34,211,238,.06);
+  }
+
+  html:not(.dark) .schedule-row input{
+    background:#fff;
+    color:#1e3348;
+    border-color:#d9e4eb;
+  }
+
+  .schedule-remove-row{
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(251,113,133,.16);
+    background:rgba(251,113,133,.045);
+    color:#fb7185;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:1rem;
+  }
+
+  .schedule-empty-day{
+    padding:18px 16px;
+    color:#71879a;
+    font-size:.78rem;
+  }
+
+  .schedule-legacy-hook{
+    display:none!important;
+  }
+
+  @media(max-width:700px){
+    .schedule-row{
+      grid-template-columns:1fr 40px;
+    }
+    .schedule-row input:first-child{
+      grid-column:1;
+    }
+    .schedule-row input:nth-child(2){
+      grid-column:1;
+    }
+    .schedule-remove-row{
+      grid-column:2;
+      grid-row:1 / span 2;
+      align-self:center;
+    }
+  }
+</style>
+
+</head>
+<body class="font-sans bg-slate-50 text-slate-800 dark:bg-navy-900 dark:text-slate-100 transition-colors duration-300">
+
+  <nav class="sticky top-0 z-50 glass border-b border-slate-200/60 dark:border-navy-700/60">
+    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="font-extrabold text-xl tracking-tight">Kelas<span class="text-accent">8B</span></a>
+        <span class="hidden sm:inline text-xs px-3 py-1 rounded-full bg-accent/20 text-accent font-semibold pulse-glow">OWNER</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="ownerName" class="hidden sm:inline text-sm font-medium text-slate-600 dark:text-slate-300"></span>
+        <button id="darkToggle" class="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-navy-700 transition">
+          <svg id="iconSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <svg id="iconMoon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <button id="logoutBtn" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-navy-700 text-sm font-semibold hover:border-red-500 hover:text-red-500 transition">Keluar</button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="max-w-6xl mx-auto px-4 pt-12 pb-6">
+    <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Panel Owner</h1>
+    <p class="text-slate-600 dark:text-slate-400">Kelola badge, project, profil siswa, wali kelas, dan jadwal dari satu tempat.</p>
+  </header>
+
+  <section class="max-w-6xl mx-auto px-4 pb-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="p-5 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700">
+        <p id="statSiswa" class="text-3xl font-black text-accent">0</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Siswa</p>
+      </div>
+      <div class="p-5 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700">
+        <p id="statBadge" class="text-3xl font-black text-accent">0</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Jenis Badge</p>
+      </div>
+      <div class="p-5 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700">
+        <p id="statAssigned" class="text-3xl font-black text-accent">0</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Badge Terpasang</p>
+      </div>
+      <div class="p-5 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700">
+        <p id="statProject" class="text-3xl font-black text-accent">0</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Projects</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-6xl mx-auto px-4 pb-10">
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      <button data-tab="badges" class="tab-btn px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-700 text-sm font-semibold transition whitespace-nowrap">Badges</button>
+      <button data-tab="projects" class="tab-btn px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-700 text-sm font-semibold transition whitespace-nowrap">Projects</button>
+      <button data-tab="siswa" class="tab-btn px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-700 text-sm font-semibold transition whitespace-nowrap">Siswa</button>
+      <button data-tab="jadwal" class="tab-btn px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-700 text-sm font-semibold transition whitespace-nowrap">Jadwal</button>
+      <button data-tab="walikelas" class="tab-btn px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-700 text-sm font-semibold transition whitespace-nowrap">Wali Kelas</button>
+      <button data-tab="data" class="tab-btn px-5 py-2.5 rounded-xl border border-slate-300 dark:border-navy-700 text-sm font-semibold transition whitespace-nowrap">Data</button>
+    </div>
+  </section>
+
+  <main class="max-w-6xl mx-auto px-4 pb-20">
+
+    <div id="tab-badges" class="tab-panel">
+      <div class="p-6 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 mb-6">
+        <h2 class="font-bold mb-4">Buat Badge Baru</h2>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input id="badgeLabel" type="text" maxlength="20" placeholder="Nama badge (mis. Juara 1)"
+            class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent" />
+          <select id="badgeColor" class="px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent">
+            <option value="cyan">Cyan</option>
+            <option value="amber">Amber</option>
+            <option value="rose">Rose</option>
+            <option value="emerald">Emerald</option>
+            <option value="violet">Violet</option>
+            <option value="slate">Slate</option>
+          </select>
+          <button id="addBadgeBtn" class="px-6 py-3 rounded-xl bg-accent text-navy-900 font-semibold hover:bg-accent-dark hover:text-white transition">Tambah</button>
+        </div>
+        <div id="badgePalette" class="mt-5 flex flex-wrap gap-2"></div>
+      </div>
+
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-bold text-lg">Pasang Badge ke Siswa</h2>
+        <input id="searchSiswaBadge" type="text" placeholder="Cari siswa..."
+          class="px-4 py-2 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-800 focus:outline-none focus:ring-2 focus:ring-accent text-sm" />
+      </div>
+      <div id="siswaListBadge" class="space-y-4"></div>
+    </div>
+
+    <div id="tab-projects" class="tab-panel hidden">
+      <div class="p-6 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700 mb-6">
+        <h2 class="font-bold mb-4">Tambah Project Baru</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Maksimal 3 project yang akan tampil di landing page.</p>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <input id="projJudul" type="text" placeholder="Judul project"
+            class="px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent" />
+          <input id="projTag" type="text" placeholder="Tag (mis. Web Development)"
+            class="px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent" />
+          <input id="projTanggal" type="text" placeholder="Tahun (mis. 2025)"
+            class="px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent" />
+          <input id="projGambar" type="text" placeholder="URL gambar"
+            class="px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent" />
+          <textarea id="projDeskripsi" rows="3" placeholder="Deskripsi project"
+            class="sm:col-span-2 px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+          <div class="sm:col-span-2 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+            <label class="flex-1 px-4 py-3 rounded-xl border border-dashed border-slate-300 dark:border-navy-700 bg-slate-50 dark:bg-navy-900 text-sm text-slate-500 dark:text-slate-400 cursor-pointer hover:border-accent transition text-center">
+              <input id="projFile" type="file" accept="image/*" class="hidden" />
+              Upload gambar dari perangkat
+            </label>
+            <button id="addProjectBtn" class="px-6 py-3 rounded-xl bg-accent text-navy-900 font-semibold hover:bg-accent-dark hover:text-white transition">Tambah Project</button>
+          </div>
+        </div>
+        <div id="projPreview" class="mt-4 hidden">
+          <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">Preview</p>
+          <img id="projPreviewImg" class="w-full max-w-xs rounded-xl border border-slate-200 dark:border-navy-700" />
+        </div>
+      </div>
+
+      <h2 class="font-bold text-lg mb-5">Daftar Projects</h2>
+      <div id="projectsList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </div>
+
+    <div id="tab-siswa" class="tab-panel hidden">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-bold text-lg">Edit Profil Siswa</h2>
+        <input id="searchSiswaEdit" type="text" placeholder="Cari siswa..."
+          class="px-4 py-2 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-800 focus:outline-none focus:ring-2 focus:ring-accent text-sm" />
+      </div>
+      <div id="siswaListEdit" class="space-y-4"></div>
+    </div>
+
+
+    <div id="tab-jadwal" class="tab-panel hidden owner-cyber-shell">
+      <div class="schedule-admin">
+        <div class="schedule-admin-head">
+          <div class="schedule-admin-kicker">06 // CLASS SCHEDULE CONTROL</div>
+          <h2 class="schedule-admin-title">Atur jadwal 8B</h2>
+          <p class="schedule-admin-copy">
+            Ubah langsung jadwal per hari seperti tabel yang kamu kirim. Setiap hari punya
+            jam sendiri, jadi waktu Senin tidak harus sama dengan Selasa, Rabu, Kamis, atau Jumat.
+            Data disimpan ke Firebase dan juga dicadangkan ke localStorage.
+          </p>
+
+          <div class="schedule-actions">
+            <button id="scheduleSave8B" type="button" class="schedule-admin-btn primary">Simpan Jadwal 8B</button>
+            <button id="scheduleReset8B" type="button" class="schedule-admin-btn">Muat Jadwal Screenshot</button>
+            <button id="scheduleClear8B" type="button" class="schedule-admin-btn danger">Kosongkan Semua</button>
+
+            <!-- Hidden legacy buttons: kept so owner.js still finds its expected hooks. -->
+            <button id="jadwalAddBtn" type="button" class="schedule-legacy-hook">legacy add</button>
+            <button id="jadwalResetBtn" type="button" class="schedule-legacy-hook">legacy reset</button>
+          </div>
+
+          <p id="scheduleSaveStatus" class="schedule-save-status"></p>
+        </div>
+
+        <div id="schedule8BDays" class="schedule-day-list"></div>
+
+        <!-- Legacy owner.js render target; intentionally hidden. -->
+        <div class="schedule-legacy-hook">
+          <table>
+            <tbody id="jadwalEditBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-walikelas" class="tab-panel hidden">
+      <div class="p-6 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700">
+        <h2 class="font-bold mb-4">Edit Profil Wali Kelas</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">Perubahan tersimpan saat kamu klik Simpan. Tampil di landing page.</p>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="md:col-span-1">
+            <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">Foto</p>
+            <div class="aspect-square rounded-full overflow-hidden bg-slate-200 dark:bg-navy-700 mb-3 max-w-[220px] mx-auto border-4 border-accent/20">
+              <img id="wkPreview" class="w-full h-full object-cover" />
+            </div>
+            <input id="wkFotoUrl" type="text" placeholder="URL foto"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 text-sm focus:outline-none focus:ring-2 focus:ring-accent mb-2" />
+            <label class="block px-4 py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-navy-700 bg-slate-50 dark:bg-navy-900 text-sm text-slate-500 dark:text-slate-400 cursor-pointer hover:border-accent transition text-center">
+              <input id="wkFotoFile" type="file" accept="image/*" class="hidden" />
+              Upload foto
+            </label>
+          </div>
+
+          <div class="md:col-span-2 space-y-4">
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Nama</label>
+              <input id="wkNamaInput" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent" />
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Jabatan</label>
+              <input id="wkJabatanInput" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent" />
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Quote</label>
+              <textarea id="wkQuoteInput" rows="5" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Tanda Tangan</label>
+              <input id="wkTtdInput" type="text" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-900 focus:outline-none focus:ring-2 focus:ring-accent" />
+            </div>
+            <div class="flex gap-3 pt-2">
+              <button id="wkSaveBtn" class="px-6 py-3 rounded-xl bg-accent text-navy-900 font-semibold hover:bg-accent-dark hover:text-white transition">Simpan</button>
+              <button id="wkResetBtn" class="px-6 py-3 rounded-xl border border-red-300 dark:border-red-900/50 text-red-500 font-semibold hover:bg-red-500 hover:text-white transition">Reset Default</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-data" class="tab-panel hidden">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700">
+          <h2 class="font-bold mb-3">Export Data</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Unduh semua data (badge, project, siswa, wali kelas, jadwal) sebagai file JSON.</p>
+          <button id="exportBtn" class="px-6 py-3 rounded-xl bg-accent text-navy-900 font-semibold hover:bg-accent-dark hover:text-white transition">Export JSON</button>
+        </div>
+        <div class="p-6 rounded-2xl bg-white dark:bg-navy-800 border border-slate-200 dark:border-navy-700">
+          <h2 class="font-bold mb-3">Import Data</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Pulihkan data dari file JSON hasil export sebelumnya.</p>
+          <label class="inline-block px-6 py-3 rounded-xl border border-slate-300 dark:border-navy-700 font-semibold cursor-pointer hover:border-accent hover:text-accent transition">
+            <input id="importFile" type="file" accept="application/json" class="hidden" />
+            Pilih File JSON
+          </label>
+        </div>
+        <div class="p-6 rounded-2xl bg-white dark:bg-navy-800 border border-red-300 dark:border-red-900/50 md:col-span-2">
+          <h2 class="font-bold mb-3 text-red-500">Reset Data</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Hapus semua badge, project, edit profil siswa, profil wali kelas, dan jadwal. Tidak bisa dibatalkan.</p>
+          <button id="resetBtn" class="px-6 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition">Reset Semua Data</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="toast" class="fixed bottom-6 right-6 px-5 py-3 rounded-xl bg-navy-800 text-white shadow-2xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300 z-50"></div>
+
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/owner.js"></script>
+
+<script>
+/* ==========================================================
+   8B Schedule Editor
+   Uses a day -> [{jam, pelajaran}] structure because the
+   source screenshot has different time ranges per day.
+   ========================================================== */
+(function(){
+  const DAYS = ['Senin','Selasa','Rabu','Kamis','Jumat'];
+
+  const DEFAULT_SCHEDULE = {"Senin": [{"jam": "11.50 – 12.10", "pelajaran": "MBG"}, {"jam": "12.10 – 12.30", "pelajaran": "Shalat Dzuhur Berjamaah, Asmaul Husna, Berdoa, dan MASKUMAMBANG"}, {"jam": "12.30 – 12.55", "pelajaran": "B.INGGRIS (1)"}, {"jam": "12.55 – 13.20", "pelajaran": "B.INGGRIS (1)"}, {"jam": "13.20 – 13.45", "pelajaran": "MTK"}, {"jam": "13.45 – 13.55", "pelajaran": "Istirahat"}, {"jam": "13.55 – 14.20", "pelajaran": "MTK"}, {"jam": "14.20 – 14.45", "pelajaran": "B.SUNDA"}, {"jam": "14.45 – 15.10", "pelajaran": "B.SUNDA"}], "Selasa": [{"jam": "11.50 – 12.10", "pelajaran": "MBG"}, {"jam": "12.10 – 12.30", "pelajaran": "Shalat Dzuhur Berjamaah, Asmaul Husna, Berdoa, dan MASKUMAMBANG"}, {"jam": "12.30 – 12.55", "pelajaran": "IPA (1)"}, {"jam": "12.55 – 13.20", "pelajaran": "IPA (1)"}, {"jam": "13.20 – 13.45", "pelajaran": "PPKn"}, {"jam": "13.45 – 14.10", "pelajaran": "PPKn"}, {"jam": "14.10 – 14.20", "pelajaran": "Istirahat"}, {"jam": "14.20 – 14.45", "pelajaran": "IPS (2)"}, {"jam": "14.45 – 15.10", "pelajaran": "IPS (2)"}, {"jam": "15.10 – 15.35", "pelajaran": "B.INDO (2)"}, {"jam": "15.35 – 16.00", "pelajaran": "B.INDO (2)"}], "Rabu": [{"jam": "11.50 – 12.10", "pelajaran": "MBG"}, {"jam": "12.10 – 12.30", "pelajaran": "Shalat Dzuhur Berjamaah, Asmaul Husna, Berdoa, dan GEULIS SAYAP"}, {"jam": "12.30 – 12.55", "pelajaran": "B.INDO (2)"}, {"jam": "12.55 – 13.20", "pelajaran": "B.INDO (2)"}, {"jam": "13.20 – 13.45", "pelajaran": "PJOK"}, {"jam": "13.45 – 14.10", "pelajaran": "PJOK"}, {"jam": "14.10 – 14.20", "pelajaran": "Istirahat"}, {"jam": "14.20 – 14.45", "pelajaran": "SENBUD & PRKY (1)"}, {"jam": "14.45 – 15.10", "pelajaran": "SENBUD & PRKY (1)"}, {"jam": "15.10 – 15.35", "pelajaran": "IPS (2)"}, {"jam": "15.35 – 16.00", "pelajaran": "IPS (2)"}], "Kamis": [{"jam": "11.50 – 12.10", "pelajaran": "MBG"}, {"jam": "12.10 – 12.40", "pelajaran": "Shalat Dzuhur Berjamaah, Asmaul Husna, Berdoa, dan MIII (Miras Runtah jeung Limbah)/SEGEUR"}, {"jam": "12.40 – 13.05", "pelajaran": "B.INGGRIS (1)"}, {"jam": "13.05 – 13.30", "pelajaran": "B.INGGRIS (1)"}, {"jam": "13.30 – 13.55", "pelajaran": "PAIBP (2)"}, {"jam": "13.55 – 14.20", "pelajaran": "PAIBP (2)"}, {"jam": "14.20 – 14.30", "pelajaran": "Istirahat"}, {"jam": "14.30 – 14.55", "pelajaran": "MTK"}, {"jam": "14.55 – 15.20", "pelajaran": "MTK"}], "Jumat": [{"jam": "12.00 – 12.50", "pelajaran": "Jum'at-an"}, {"jam": "12.50 – 13.20", "pelajaran": "MBG"}, {"jam": "13.20 – 13.30", "pelajaran": "Asmaul Husna dan Berdoa"}, {"jam": "13.30 – 13.55", "pelajaran": "INFORMATIKA"}, {"jam": "13.55 – 14.20", "pelajaran": "INFORMATIKA"}, {"jam": "14.20 – 14.45", "pelajaran": "IPA (1)"}, {"jam": "14.45 – 15.10", "pelajaran": "IPA (1)"}]};;
+
+  const root = document.getElementById('schedule8BDays');
+  const status = document.getElementById('scheduleSaveStatus');
+  const saveBtn = document.getElementById('scheduleSave8B');
+  const resetBtn = document.getElementById('scheduleReset8B');
+  const clearBtn = document.getElementById('scheduleClear8B');
+
+  if(!root) return;
+
+  let state = structuredCloneSafe(DEFAULT_SCHEDULE);
+
+  function structuredCloneSafe(value){
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function setStatus(text, type){
+    if(!status) return;
+    status.textContent = text || '';
+    status.style.color =
+      type === 'error' ? '#fb7185' :
+      type === 'success' ? '#6ee7b7' :
+      '#8196ab';
+  }
+
+  function esc(value){
+    return String(value ?? '').replace(/[&<>"']/g, function(char){
+      return {
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#39;'
+      }[char];
+    });
+  }
+
+  function isBreak(subject){
+    return String(subject || '').toLowerCase().includes('istirahat');
+  }
+
+  function isSpecial(subject){
+    const s = String(subject || '').toLowerCase();
+    return s === 'mbg' || s.includes('shalat') || s.includes('shalet') ||
+           s.includes('asmaul husna') || s.includes('berdoa') ||
+           s.includes("jum'at-an") || s.includes('jumat-an');
+  }
+
+  function rowTemplate(day, index, row){
+    return `
+      <div class="schedule-row" data-day="${esc(day)}" data-index="${index}">
+        <input type="text" data-field="jam" value="${esc(row.jam || '')}" placeholder="Contoh 12.30 – 12.55">
+        <input type="text" data-field="pelajaran" value="${esc(row.pelajaran || '')}" placeholder="Nama pelajaran / kegiatan">
+        <button type="button" class="schedule-remove-row" title="Hapus baris" data-remove-row="${esc(day)}" data-index="${index}">×</button>
+      </div>
+    `;
+  }
+
+  function render(){
+    root.innerHTML = DAYS.map(function(day){
+      const rows = Array.isArray(state[day]) ? state[day] : [];
+
+      return `
+        <section class="schedule-day-card">
+          <div class="schedule-day-head">
+            <div>
+              <div class="schedule-admin-kicker">DAY NODE</div>
+              <div class="schedule-day-name">${esc(day)}</div>
+            </div>
+            <button type="button" class="schedule-add-day" data-add-day="${esc(day)}">+ Tambah Jam</button>
+          </div>
+          ${
+            rows.length
+              ? rows.map((row,index)=>rowTemplate(day,index,row)).join('')
+              : '<div class="schedule-empty-day">Belum ada slot. Tambahkan jam dan pelajaran.</div>'
+          }
+        </section>
+      `;
+    }).join('');
+
+    root.querySelectorAll('[data-remove-row]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const day = btn.dataset.removeRow;
+        const index = Number(btn.dataset.index);
+        if(!Array.isArray(state[day])) return;
+        state[day].splice(index,1);
+        render();
+      });
+    });
+
+    root.querySelectorAll('[data-add-day]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const day = btn.dataset.addDay;
+        if(!Array.isArray(state[day])) state[day] = [];
+        state[day].push({jam:'',pelajaran:''});
+        render();
+
+        const section = [...root.querySelectorAll('.schedule-day-card')]
+          .find(el => el.querySelector('[data-add-day]')?.dataset.addDay === day);
+
+        const inputs = section?.querySelectorAll('input');
+        inputs?.[inputs.length - 2]?.focus();
+      });
+    });
+
+    root.querySelectorAll('input[data-field]').forEach(function(input){
+      input.addEventListener('input', function(){
+        const rowEl = input.closest('.schedule-row');
+        if(!rowEl) return;
+        const day = rowEl.dataset.day;
+        const index = Number(rowEl.dataset.index);
+        const field = input.dataset.field;
+        if(!state[day]?.[index]) return;
+        state[day][index][field] = input.value;
+      });
+    });
+  }
+
+  function arrayToObject(rows){
+    const out = {};
+    DAYS.forEach(day => out[day] = []);
+
+    if(!Array.isArray(rows)) return out;
+
+    rows.forEach(function(row){
+      DAYS.forEach(function(day){
+        const key = day.toLowerCase();
+        const subject = row[key];
+        if(subject !== undefined && subject !== null && String(subject).trim() !== '' && subject !== '—'){
+          out[day].push({
+            jam: row.jam || '',
+            pelajaran: String(subject)
+          });
+        }
+      });
+    });
+
+    return out;
+  }
+
+  function normalize(value){
+    if(Array.isArray(value)) return arrayToObject(value);
+
+    if(value && typeof value === 'object'){
+      const out = {};
+      DAYS.forEach(function(day){
+        const rows = Array.isArray(value[day]) ? value[day] : [];
+        out[day] = rows.map(function(row){
+          if(Array.isArray(row)){
+            return {jam: row[0] || '', pelajaran: row[1] || ''};
+          }
+          return {
+            jam: row?.jam || '',
+            pelajaran: row?.pelajaran || row?.subject || row?.mapel || ''
+          };
+        });
+      });
+      return out;
+    }
+
+    return structuredCloneSafe(DEFAULT_SCHEDULE);
+  }
+
+  function firebaseReady(){
+    return window.firebase &&
+           typeof firebase.database === 'function' &&
+           window.FIREBASE_PATHS &&
+           window.FIREBASE_PATHS.jadwal;
+  }
+
+  async function loadFromFirebase(){
+    try{
+      if(!firebaseReady()) return null;
+      const snap = await firebase.database().ref(FIREBASE_PATHS.jadwal).once('value');
+      if(snap && snap.exists()){
+        return normalize(snap.val());
+      }
+    }catch(error){
+      console.warn('Gagal membaca jadwal Firebase:', error);
+    }
+    return null;
+  }
+
+  async function save(){
+    // Ensure latest input values are captured before save.
+    root.querySelectorAll('input[data-field]').forEach(function(input){
+      const rowEl = input.closest('.schedule-row');
+      if(!rowEl) return;
+      const day = rowEl.dataset.day;
+      const index = Number(rowEl.dataset.index);
+      const field = input.dataset.field;
+      if(state[day]?.[index]) state[day][index][field] = input.value;
+    });
+
+    try{
+      localStorage.setItem('class_jadwal_8b', JSON.stringify(state));
+    }catch(error){}
+
+    if(firebaseReady()){
+      try{
+        await firebase.database().ref(FIREBASE_PATHS.jadwal).set(state);
+        setStatus('✓ Jadwal 8B berhasil disimpan ke Firebase.', 'success');
+        return;
+      }catch(error){
+        console.error(error);
+        setStatus('Local tersimpan, tetapi Firebase gagal disimpan.', 'error');
+        return;
+      }
+    }
+
+    setStatus('✓ Jadwal tersimpan di browser. Firebase belum siap.', 'success');
+  }
+
+  async function resetToSource(){
+    state = structuredCloneSafe(DEFAULT_SCHEDULE);
+    try{
+      localStorage.setItem('class_jadwal_8b', JSON.stringify(state));
+    }catch(error){}
+    render();
+    setStatus('Jadwal contoh dari screenshot dimuat. Klik Simpan Jadwal 8B untuk mengirim ke Firebase.');
+  }
+
+  function clearAll(){
+    state = {};
+    DAYS.forEach(day => state[day] = []);
+    render();
+    setStatus('Semua slot dikosongkan. Belum disimpan sampai tombol Simpan ditekan.');
+  }
+
+  if(saveBtn) saveBtn.addEventListener('click', save);
+  if(resetBtn) resetBtn.addEventListener('click', resetToSource);
+  if(clearBtn) clearBtn.addEventListener('click', function(){
+    if(confirm('Kosongkan semua jadwal 8B di editor?')) clearAll();
+  });
+
+  // Load browser cache first, then Firebase. This avoids a blank editor.
+  try{
+    const cached = localStorage.getItem('class_jadwal_8b');
+    if(cached) state = normalize(JSON.parse(cached));
+  }catch(error){}
+
+  render();
+
+  loadFromFirebase().then(function(data){
+    if(data){
+      state = data;
+      try{
+        localStorage.setItem('class_jadwal_8b', JSON.stringify(state));
+      }catch(error){}
+      render();
+      setStatus('✓ Jadwal dari Firebase berhasil dimuat.', 'success');
+    }
+  });
+
+  // Realtime updates from Firebase.
+  try{
+    if(window.firebase && firebase.database && window.FIREBASE_PATHS?.jadwal){
+      firebase.database().ref(FIREBASE_PATHS.jadwal).on('value', function(snapshot){
+        if(!snapshot.exists()) return;
+        const data = normalize(snapshot.val());
+        state = data;
+        try{
+          localStorage.setItem('class_jadwal_8b', JSON.stringify(state));
+        }catch(error){}
+        render();
+      });
+    }
+  }catch(error){
+    console.warn('Realtime jadwal owner:', error);
+  }
+})();
+</script>
+
+</body>
+</html>
