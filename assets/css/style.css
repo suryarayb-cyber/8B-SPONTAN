@@ -1,0 +1,863 @@
+/* ==========================================================
+   WEBSITE 8B — GLOBAL THEME / STYLE.CSS
+   Safe replacement for the original style.css.
+   Designed to work with the existing HTML + JS/Firebase files.
+   ========================================================== */
+
+:root{
+  color-scheme: dark;
+  --bg:#030712;
+  --bg-soft:#07111f;
+  --bg-panel:#081321;
+  --bg-panel-2:#0b1727;
+  --text:#e8f7ff;
+  --text-soft:#a1b3c5;
+  --text-muted:#74899d;
+  --cyan:#22d3ee;
+  --cyan-bright:#67e8f9;
+  --cyan-dark:#0891b2;
+  --blue:#3b82f6;
+  --violet:#8b5cf6;
+  --pink:#ec4899;
+  --green:#34d399;
+  --red:#fb7185;
+  --border:rgba(34,211,238,.14);
+  --border-strong:rgba(103,232,249,.34);
+  --shadow:0 18px 55px rgba(0,0,0,.28);
+  --shadow-lg:0 28px 80px rgba(0,0,0,.42);
+}
+
+/* Light theme is activated by main.js through html.dark removal. */
+html:not(.dark){
+  color-scheme:light;
+  --bg:#f5f8fb;
+  --bg-soft:#eef3f7;
+  --bg-panel:#ffffff;
+  --bg-panel-2:#f8fbfd;
+  --text:#17273a;
+  --text-soft:#3f556a;
+  --text-muted:#6c7f91;
+  --border:rgba(15,23,42,.10);
+  --border-strong:rgba(8,145,178,.34);
+  --shadow:0 18px 45px rgba(15,23,42,.08);
+  --shadow-lg:0 28px 65px rgba(15,23,42,.12);
+}
+
+/* ----------------------------------------------------------
+   BASE
+   ---------------------------------------------------------- */
+
+html{
+  background:var(--bg);
+  scroll-behavior:smooth;
+}
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(34,211,238,.07),transparent 28%),
+    radial-gradient(circle at 90% 10%,rgba(139,92,246,.07),transparent 30%),
+    linear-gradient(180deg,var(--bg) 0%,var(--bg) 58%,var(--bg-soft) 100%);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+a,
+button{
+  -webkit-tap-highlight-color:transparent;
+}
+
+::selection{
+  background:var(--cyan);
+  color:#021018;
+}
+
+:focus-visible{
+  outline:2px solid var(--cyan);
+  outline-offset:3px;
+}
+
+/* ----------------------------------------------------------
+   SUBTLE CYBER BACKGROUND
+   ---------------------------------------------------------- */
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-3;
+  pointer-events:none;
+  opacity:.09;
+  background-image:
+    linear-gradient(rgba(34,211,238,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,211,238,.08) 1px,transparent 1px);
+  background-size:52px 52px;
+  mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.72) 46%,transparent 100%);
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:9998;
+  pointer-events:none;
+  opacity:.018;
+  background:repeating-linear-gradient(
+    to bottom,
+    transparent 0 3px,
+    rgba(255,255,255,.35) 4px
+  );
+}
+
+html:not(.dark) body::before{
+  opacity:.025;
+}
+
+html:not(.dark) body::after{
+  display:none;
+}
+
+/* ----------------------------------------------------------
+   SCROLLBAR
+   ---------------------------------------------------------- */
+
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,var(--cyan-dark),var(--violet));
+  border-radius:999px;
+  border:2px solid var(--bg);
+}
+
+/* ----------------------------------------------------------
+   TAILWIND COLOR BRIDGES
+   Keep old HTML working while changing the visual language.
+   ---------------------------------------------------------- */
+
+.bg-white{background-color:var(--bg-panel)!important}
+.bg-slate-50{background-color:var(--bg)!important}
+.bg-slate-100{background-color:var(--bg-panel-2)!important}
+.bg-slate-200{background-color:#102033!important}
+
+.text-slate-800{color:var(--text)!important}
+.text-slate-700{color:var(--text-soft)!important}
+.text-slate-600{color:var(--text-soft)!important}
+.text-slate-500{color:var(--text-muted)!important}
+.text-slate-400{color:#8398ab!important}
+
+.border-slate-200,
+.border-slate-300,
+.dark\:border-navy-700{
+  border-color:var(--border)!important;
+}
+
+/* Explicitly restore the light side. */
+html:not(.dark) .bg-white{background:#fff!important}
+html:not(.dark) .bg-slate-50{background:#f5f8fb!important}
+html:not(.dark) .bg-slate-100{background:#edf3f7!important}
+html:not(.dark) .bg-slate-200{background:#e3ebf1!important}
+
+html:not(.dark) .text-slate-800{color:#17273a!important}
+html:not(.dark) .text-slate-700{color:#2e465c!important}
+html:not(.dark) .text-slate-600{color:#52697d!important}
+html:not(.dark) .text-slate-500{color:#657b8e!important}
+html:not(.dark) .text-slate-400{color:#7c90a1!important}
+
+/* Dark variants from old HTML. */
+.dark\:bg-navy-900{background-color:var(--bg)!important}
+.dark\:bg-navy-800{background-color:var(--bg-panel)!important}
+.dark\:bg-navy-700{background-color:var(--bg-panel-2)!important}
+
+/* ----------------------------------------------------------
+   NAV
+   ---------------------------------------------------------- */
+
+nav.glass,
+nav.backdrop-blur{
+  background:rgba(2,7,18,.78)!important;
+  border-color:var(--border)!important;
+  box-shadow:0 10px 36px rgba(0,0,0,.22);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+
+html:not(.dark) nav.glass,
+html:not(.dark) nav.backdrop-blur{
+  background:rgba(255,255,255,.86)!important;
+  box-shadow:0 10px 30px rgba(15,23,42,.08);
+}
+
+nav a:hover{
+  color:var(--cyan-bright)!important;
+}
+
+#secretLogo{
+  color:var(--text-strong,#f7fbff);
+  text-shadow:0 0 14px rgba(34,211,238,.32);
+}
+
+#secretLogo .text-accent{
+  color:var(--cyan-bright)!important;
+}
+
+/* ----------------------------------------------------------
+   GENERIC PANELS / CARDS
+   ---------------------------------------------------------- */
+
+.shadow-xl,
+.shadow-2xl{
+  box-shadow:var(--shadow-lg)!important;
+}
+
+.card-hover{
+  transition:
+    transform .28s ease,
+    box-shadow .28s ease,
+    border-color .28s ease;
+}
+
+.card-hover:hover{
+  transform:translateY(-6px);
+  border-color:var(--border-strong)!important;
+  box-shadow:
+    0 22px 60px rgba(0,0,0,.30),
+    0 0 24px rgba(34,211,238,.06);
+}
+
+html:not(.dark) .card-hover:hover{
+  box-shadow:0 18px 44px rgba(15,23,42,.10);
+}
+
+/* Existing cards from the old markup. */
+section > div > .bg-white,
+section > div > div.bg-white,
+article .bg-white{
+  box-shadow:var(--shadow);
+}
+
+/* ----------------------------------------------------------
+   INPUTS / SELECTS / TEXTAREAS
+   ---------------------------------------------------------- */
+
+input:not([type="file"]),
+select,
+textarea{
+  background:rgba(3,9,19,.74)!important;
+  color:var(--text)!important;
+  border-color:var(--border)!important;
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:var(--text-muted);
+}
+
+input:not([type="file"]):focus,
+select:focus,
+textarea:focus{
+  border-color:var(--cyan)!important;
+  box-shadow:0 0 0 3px rgba(34,211,238,.07)!important;
+}
+
+html:not(.dark) input:not([type="file"]),
+html:not(.dark) select,
+html:not(.dark) textarea{
+  background:#fff!important;
+  color:#17273a!important;
+  border-color:#d5e1e8!important;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder{
+  color:#8698a8;
+}
+
+option{
+  background:#07111f;
+  color:#e8f7ff;
+}
+
+html:not(.dark) option{
+  background:#fff;
+  color:#17273a;
+}
+
+/* ----------------------------------------------------------
+   ACCENTS
+   ---------------------------------------------------------- */
+
+.text-accent{
+  color:var(--cyan-bright)!important;
+}
+
+.bg-accent{
+  background:linear-gradient(135deg,#67e8f9,#22d3ee 48%,#60a5fa)!important;
+  color:#031018!important;
+}
+
+.bg-accent:hover{
+  box-shadow:0 0 24px rgba(34,211,238,.20);
+  filter:brightness(1.04);
+}
+
+.text-gradient{
+  background:linear-gradient(90deg,#67e8f9,#60a5fa,#a78bfa,#f0abfc);
+  background-size:220% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:gradientShift 7s ease infinite;
+}
+
+@keyframes gradientShift{
+  0%,100%{background-position:0 50%}
+  50%{background-position:100% 50%}
+}
+
+/* ----------------------------------------------------------
+   ORIGINAL ANIMATIONS — preserve existing functionality
+   ---------------------------------------------------------- */
+
+@keyframes badgePop{
+  0%{transform:scale(0) rotate(-12deg);opacity:0}
+  60%{transform:scale(1.12) rotate(4deg);opacity:1}
+  100%{transform:scale(1) rotate(0)}
+}
+
+@keyframes badgeFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes floatSlow{
+  0%,100%{transform:translateY(0) rotate(0)}
+  50%{transform:translateY(-12px) rotate(3deg)}
+}
+
+@keyframes shimmer{
+  0%{background-position:-500px 0}
+  100%{background-position:500px 0}
+}
+
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(34,211,238,.45)}
+  50%{box-shadow:0 0 0 10px rgba(34,211,238,0)}
+}
+
+@keyframes marquee{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+
+@keyframes blob{
+  0%,100%{
+    border-radius:42% 58% 63% 37% / 41% 44% 56% 59%;
+    transform:translate(0,0) scale(1);
+  }
+  34%{
+    border-radius:62% 38% 42% 58% / 54% 62% 38% 46%;
+    transform:translate(12px,-8px) scale(1.05);
+  }
+  67%{
+    border-radius:38% 62% 51% 49% / 44% 56% 44% 56%;
+    transform:translate(-10px,10px) scale(.97);
+  }
+}
+
+@keyframes ringSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes ringSpinReverse{from{transform:rotate(360deg)}to{transform:rotate(0)}}
+
+@keyframes photoReveal{
+  0%{opacity:0;transform:scale(1.06);filter:blur(7px) saturate(.7)}
+  100%{opacity:1;transform:scale(1);filter:blur(0) saturate(1)}
+}
+
+@keyframes sparkle{
+  0%,100%{opacity:0;transform:scale(0) rotate(0)}
+  50%{opacity:1;transform:scale(1) rotate(180deg)}
+}
+
+@keyframes quoteFade{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes caretBlink{
+  0%,49%{opacity:1}
+  50%,100%{opacity:0}
+}
+
+@keyframes cardGlow{
+  0%,100%{
+    box-shadow:0 0 0 0 rgba(34,211,238,0),0 24px 40px -18px rgba(34,211,238,.14);
+  }
+  50%{
+    box-shadow:0 0 0 4px rgba(34,211,238,.045),0 24px 40px -18px rgba(34,211,238,.24);
+  }
+}
+
+@keyframes auroraMove{
+  0%,100%{transform:translate3d(-5%,-5%,0) rotate(0)}
+  50%{transform:translate3d(5%,5%,0) rotate(8deg)}
+}
+
+@keyframes signatureDraw{
+  from{clip-path:inset(0 100% 0 0)}
+  to{clip-path:inset(0 0 0 0)}
+}
+
+/* Existing utility classes. */
+.badge-pop{animation:badgePop .45s cubic-bezier(.34,1.56,.64,1) both}
+.badge-float{animation:badgeFloat 2.4s ease-in-out infinite}
+.fade-in-up{animation:fadeInUp .6s ease both}
+.float-slow{animation:floatSlow 6s ease-in-out infinite}
+.pulse-glow{animation:pulseGlow 2s ease-in-out infinite}
+.blob{animation:blob 14s ease-in-out infinite}
+
+.mesh-bg{
+  background:
+    radial-gradient(at 20% 20%,rgba(34,211,238,.10),transparent 50%),
+    radial-gradient(at 80% 10%,rgba(96,165,250,.10),transparent 50%),
+    radial-gradient(at 50% 80%,rgba(167,139,250,.08),transparent 50%)!important;
+}
+
+html:not(.dark) .mesh-bg{
+  background:
+    radial-gradient(at 20% 20%,rgba(34,211,238,.06),transparent 50%),
+    radial-gradient(at 80% 10%,rgba(96,165,250,.05),transparent 50%),
+    radial-gradient(at 50% 80%,rgba(167,139,250,.04),transparent 50%)!important;
+}
+
+.marquee{
+  overflow:hidden;
+  white-space:nowrap;
+}
+
+.marquee > div{
+  display:inline-block;
+  animation:marquee 26s linear infinite;
+}
+
+/* ----------------------------------------------------------
+   HERO / OLD LANDING PAGE
+   ---------------------------------------------------------- */
+
+header.mesh-bg{
+  position:relative;
+}
+
+header.mesh-bg .rounded-3xl.bg-white,
+header.mesh-bg .rounded-3xl.dark\:bg-navy-800{
+  background:
+    linear-gradient(145deg,rgba(8,18,35,.88),rgba(3,9,19,.80))!important;
+  border-color:var(--border)!important;
+  box-shadow:var(--shadow-lg)!important;
+}
+
+html:not(.dark) header.mesh-bg .rounded-3xl.bg-white{
+  background:#fff!important;
+  box-shadow:0 22px 55px rgba(15,23,42,.08)!important;
+}
+
+/* ----------------------------------------------------------
+   PROJECT CARD
+   ---------------------------------------------------------- */
+
+.project-card{
+  background:
+    linear-gradient(145deg,rgba(8,18,35,.82),rgba(3,9,19,.74));
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+
+html:not(.dark) .project-card{
+  background:#fff;
+  border-color:#dce6ed;
+}
+
+/* ----------------------------------------------------------
+   TIMELINE
+   ---------------------------------------------------------- */
+
+.timeline-dot::before{
+  content:"";
+  position:absolute;
+  left:-9px;
+  top:6px;
+  width:16px;
+  height:16px;
+  border-radius:999px;
+  background:var(--cyan);
+  box-shadow:
+    0 0 0 4px rgba(34,211,238,.10),
+    0 0 16px rgba(34,211,238,.55);
+}
+
+/* ----------------------------------------------------------
+   WALI KELAS
+   ---------------------------------------------------------- */
+
+.wk-wrap{
+  position:relative;
+  isolation:isolate;
+}
+
+.wk-aurora{
+  position:absolute;
+  inset:-20%;
+  background:
+    conic-gradient(from 0deg at 30% 30%,rgba(34,211,238,.14),transparent 42%),
+    conic-gradient(from 180deg at 70% 70%,rgba(96,165,250,.13),transparent 45%),
+    conic-gradient(from 90deg at 50% 100%,rgba(167,139,250,.10),transparent 50%);
+  filter:blur(60px);
+  animation:auroraMove 18s ease-in-out infinite;
+  z-index:0;
+  pointer-events:none;
+}
+
+.wk-card{
+  position:relative;
+  z-index:1;
+  animation:cardGlow 4.5s ease-in-out infinite;
+}
+
+.wk-photo-reveal{
+  animation:photoReveal 1.2s cubic-bezier(.22,1,.36,1) both;
+}
+
+.wk-ring-1,
+.wk-ring-2{
+  position:absolute;
+  border-radius:50%;
+  border:2px dashed rgba(34,211,238,.27);
+  pointer-events:none;
+}
+
+.wk-ring-1{inset:-14px;animation:ringSpin 22s linear infinite}
+.wk-ring-2{
+  inset:-26px;
+  border-style:dotted;
+  border-color:rgba(96,165,250,.24);
+  animation:ringSpinReverse 30s linear infinite;
+}
+
+.wk-sparkle{
+  position:absolute;
+  width:10px;
+  height:10px;
+  pointer-events:none;
+  animation:sparkle 3s ease-in-out infinite;
+}
+
+.wk-sparkle::before,
+.wk-sparkle::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:var(--cyan);
+  border-radius:2px;
+}
+
+.wk-sparkle::after{
+  transform:rotate(90deg);
+  opacity:.55;
+}
+
+.wk-quote-caret::after{
+  content:"▍";
+  color:var(--cyan);
+  margin-left:2px;
+  animation:caretBlink 1s steps(2) infinite;
+}
+
+.wk-ttd{
+  font-family:"Brush Script MT","Segoe Script",cursive;
+  letter-spacing:.5px;
+  display:inline-block;
+}
+
+.wk-ttd.animate{
+  animation:signatureDraw 1.6s ease 1.2s both;
+}
+
+.wk-badge-float{
+  animation:badgeFloat 2.8s ease-in-out infinite;
+}
+
+.wk-badge-float.delay-1{animation-delay:.4s}
+.wk-badge-float.delay-2{animation-delay:.8s}
+
+.wk-quote-line{
+  display:block;
+  overflow:hidden;
+  animation:quoteFade .6s ease both;
+}
+
+/* ----------------------------------------------------------
+   FAQ
+   ---------------------------------------------------------- */
+
+details{
+  background:rgba(7,14,27,.74)!important;
+  border-color:var(--border)!important;
+}
+
+html:not(.dark) details{
+  background:#fff!important;
+  border-color:#dce6ed!important;
+}
+
+details[open]{
+  border-color:var(--border-strong)!important;
+  box-shadow:0 0 25px rgba(34,211,238,.05);
+}
+
+/* ----------------------------------------------------------
+   MUSIC BAR — RESTORED
+   This is used by assets/js/music.js.
+   ---------------------------------------------------------- */
+
+.music-bar{
+  position:fixed!important;
+  left:18px!important;
+  bottom:18px!important;
+  z-index:9999!important;
+
+  display:inline-flex!important;
+  align-items:center;
+  gap:4px;
+
+  padding:6px 14px 6px 6px;
+  min-height:44px;
+
+  border-radius:999px;
+  border:1px solid rgba(34,211,238,.17);
+
+  background:rgba(3,10,21,.91);
+  color:#dff8ff;
+
+  box-shadow:
+    0 14px 35px rgba(0,0,0,.32),
+    0 0 20px rgba(34,211,238,.04);
+
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+
+  font-family:Inter,sans-serif;
+}
+
+.music-bar.is-playing{
+  border-color:rgba(34,211,238,.42);
+  box-shadow:
+    0 14px 35px rgba(0,0,0,.32),
+    0 0 24px rgba(34,211,238,.12);
+}
+
+html:not(.dark) .music-bar{
+  background:rgba(255,255,255,.94);
+  color:#24394d;
+  border-color:#d8e3ea;
+  box-shadow:0 14px 32px rgba(15,23,42,.11);
+}
+
+html:not(.dark) .music-bar.is-playing{
+  border-color:rgba(8,145,178,.38);
+}
+
+.music-btn{
+  width:32px;
+  height:32px;
+  border:0;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  color:#7890a3;
+  background:transparent;
+  cursor:pointer;
+  padding:0;
+  transition:background .2s,color .2s,transform .15s;
+}
+
+.music-btn svg{
+  width:14px;
+  height:14px;
+}
+
+.music-btn:hover{
+  background:rgba(34,211,238,.07);
+  color:var(--cyan);
+}
+
+.music-btn:active{
+  transform:scale(.90);
+}
+
+.music-bar.is-playing #musicOn{
+  background:var(--cyan);
+  color:#021018;
+  box-shadow:0 0 15px rgba(34,211,238,.18);
+}
+
+.music-divider{
+  width:1px;
+  height:16px;
+  background:rgba(148,163,184,.20);
+  margin:0 4px;
+  flex-shrink:0;
+}
+
+.music-vol{
+  width:64px;
+  height:4px;
+  appearance:none;
+  -webkit-appearance:none;
+  background:rgba(148,163,184,.22);
+  border-radius:999px;
+  outline:none;
+  cursor:pointer;
+  margin:0 4px;
+}
+
+.music-vol::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:12px;
+  height:12px;
+  border-radius:999px;
+  background:var(--cyan);
+  cursor:pointer;
+  border:2px solid #fff;
+}
+
+.music-vol::-moz-range-thumb{
+  width:12px;
+  height:12px;
+  border:2px solid #fff;
+  border-radius:999px;
+  background:var(--cyan);
+  cursor:pointer;
+}
+
+.music-label{
+  font-size:12px;
+  font-weight:600;
+  color:#8499ac;
+  padding:0 6px 0 4px;
+  white-space:nowrap;
+  max-width:130px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.music-bar.is-playing .music-label{
+  color:var(--cyan-bright);
+}
+
+html:not(.dark) .music-label{
+  color:#667c90;
+}
+
+html:not(.dark) .music-bar.is-playing .music-label{
+  color:var(--cyan-dark);
+}
+
+@media(max-width:640px){
+  .music-bar{
+    left:12px!important;
+    bottom:12px!important;
+    padding:5px 10px 5px 5px;
+  }
+
+  .music-vol,
+  .music-divider{
+    display:none;
+  }
+
+  .music-label{
+    max-width:82px;
+    font-size:11px;
+  }
+}
+
+/* ----------------------------------------------------------
+   FOOTER
+   ---------------------------------------------------------- */
+
+footer{
+  background:#020617!important;
+  border-color:var(--border)!important;
+}
+
+html:not(.dark) footer{
+  background:#edf3f7!important;
+}
+
+/* ----------------------------------------------------------
+   REVEAL — NO PERMANENT BLUR
+   ---------------------------------------------------------- */
+
+[data-reveal]{
+  opacity:0;
+  transform:translateY(20px);
+  filter:none;
+  transition:
+    opacity .7s ease,
+    transform .7s cubic-bezier(.22,1,.36,1);
+}
+
+/* main.js may use either .revealed or .active depending on page. */
+[data-reveal].revealed,
+[data-reveal].active{
+  opacity:1;
+  transform:none;
+}
+
+/* ----------------------------------------------------------
+   MOBILE MENU
+   ---------------------------------------------------------- */
+
+#mobileMenu{
+  border-color:var(--border)!important;
+}
+
+html:not(.dark) #mobileMenu{
+  background:rgba(255,255,255,.96)!important;
+}
+
+/* ----------------------------------------------------------
+   REDUCED MOTION
+   ---------------------------------------------------------- */
+
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+
+  [data-reveal]{
+    opacity:1!important;
+    transform:none!important;
+  }
+}
